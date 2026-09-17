@@ -126,11 +126,12 @@
 
   /* ---- Speech ---- */
   let chosenVoice = null;
+  let activeUtterance = null;
   function initVoices() {
     if (!hasSpeech) return;
     const pick = () => {
       const voices = window.speechSynthesis.getVoices();
-      if (!voices.length) return;
+      if (!voices.length) return false;
       chosenVoice =
         voices.find(v => /en-US/i.test(v.lang) && /Google/i.test(v.name)) ||
         voices.find(v => /Google/i.test(v.name) && /^en/i.test(v.lang)) ||
@@ -138,11 +139,19 @@
         voices.find(v => /en-US/i.test(v.lang)) ||
         voices.find(v => /^en/i.test(v.lang)) ||
         voices[0] || null;
+      return true;
     };
     pick();
     if (window.speechSynthesis.onvoiceschanged !== undefined) {
       window.speechSynthesis.onvoiceschanged = pick;
     }
+    // Some mobile browsers never fire onvoiceschanged and return an
+    // empty list at first, so keep retrying briefly until voices show up.
+    let attempts = 0;
+    const retry = setInterval(() => {
+      attempts += 1;
+      if (pick() || attempts > 10) clearInterval(retry);
+    }, 300);
   }
   initVoices();
 
@@ -150,12 +159,22 @@
     if (!soundOn || !hasSpeech) return;
     try {
       window.speechSynthesis.cancel();
-      const utter = new SpeechSynthesisUtterance(letter);
-      utter.lang = 'en-US';
-      utter.rate = 0.8;
-      if (chosenVoice) utter.voice = chosenVoice;
-      window.speechSynthesis.speak(utter);
-      restart(replayBtn, 'playing');
+      // Calling speak() immediately after cancel() gets silently dropped
+      // on some mobile browsers (notably Android Chrome); a short delay
+      // avoids the race. Keeping the utterance in an outer variable stops
+      // it from being garbage-collected mid-speech, which also causes
+      // silent failures on mobile.
+      setTimeout(() => {
+        const utter = new SpeechSynthesisUtterance(letter);
+        utter.lang = 'en-US';
+        utter.rate = 0.8;
+        utter.volume = 1;
+        if (chosenVoice) utter.voice = chosenVoice;
+        activeUtterance = utter;
+        if (window.speechSynthesis.paused) window.speechSynthesis.resume();
+        window.speechSynthesis.speak(utter);
+        restart(replayBtn, 'playing');
+      }, 60);
     } catch (e) { /* ignore */ }
   }
 
@@ -366,7 +385,15 @@
     startOverlay.classList.remove('show');
     const ctx = getCtx();
     if (ctx && ctx.state === 'suspended') ctx.resume();
-    if (hasSpeech) { try { window.speechSynthesis.speak(new SpeechSynthesisUtterance(' ')); } catch (e) {} }
+    if (hasSpeech) {
+      try {
+        // A silent speak() inside this tap unlocks speech synthesis on
+        // iOS/Android; keeping a reference stops it being garbage-collected.
+        activeUtterance = new SpeechSynthesisUtterance(' ');
+        activeUtterance.volume = 0;
+        window.speechSynthesis.speak(activeUtterance);
+      } catch (e) { /* ignore */ }
+    }
     renderLives(false);
     renderScore(false);
     renderStreak(false);
