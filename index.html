@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Frog Jump ABC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="app">
+
+  <header class="hud">
+    <div class="hearts" id="hearts" aria-label="Lives">
+      <span class="heart"></span><span class="heart"></span><span class="heart"></span>
+    </div>
+    <h1 class="title">Frog Jump ABC</h1>
+    <div class="score" id="scoreValue">0</div>
+  </header>
+
+  <div class="sign" id="sign">
+    <div class="sun"></div>
+    <div class="cloud cloud-1"></div>
+    <div class="cloud cloud-2"></div>
+    <span class="round-label" id="roundLabel">Round 1</span>
+    <p class="sign-text" id="signText">Listen, then tap the letter</p>
+    <button class="replay-btn" id="replayBtn" type="button">Hear it again</button>
+  </div>
+
+  <main class="pond" id="pond">
+    <div class="water"></div>
+    <div class="bubbles" id="bubbles"></div>
+
+    <div class="pads-row" id="padsRow">
+      <button class="pad" type="button"><span class="leaf"></span><span class="value">A</span></button>
+      <button class="pad" type="button"><span class="leaf"></span><span class="value">B</span></button>
+      <button class="pad" type="button"><span class="leaf"></span><span class="value">C</span></button>
+    </div>
+
+    <div class="home-pad"></div>
+
+    <div class="frog-wrap" id="frogWrap">
+      <div class="frog" id="frog">
+        <div class="frog-leg left"></div>
+        <div class="frog-leg right"></div>
+        <div class="frog-body">
+          <div class="frog-eye left"><span class="pupil"></span></div>
+          <div class="frog-eye right"><span class="pupil"></span></div>
+          <div class="frog-cheek left"></div>
+          <div class="frog-cheek right"></div>
+          <div class="frog-mouth"></div>
+          <div class="frog-belly"></div>
+        </div>
+      </div>
+      <div class="frog-shadow"></div>
+    </div>
+
+    <div class="confetti-layer" id="confettiLayer"></div>
+    <div class="feedback" id="feedback"></div>
+    <div class="flash" id="flash"></div>
+  </main>
+
+  <footer class="bottombar">
+    <div class="chip" id="streakChip">🔥 <span id="streakValue">Streak 0</span></div>
+    <div class="chip">🏆 <span id="bestValue">Best 0</span></div>
+    <div class="bottom-actions">
+      <button class="icon-btn" id="soundBtn" type="button" aria-label="Toggle sound">🔊</button>
+      <button class="icon-btn" id="fullscreenBtn" type="button" aria-label="Toggle fullscreen">⛶</button>
+    </div>
+  </footer>
+
+</div>
+
+<div class="overlay show" id="startOverlay">
+  <div class="card">
+    <span class="frog-mini">🐸</span>
+    <h2>Frog Jump ABC</h2>
+    <p>Listen to the letter, then tap the lily pad that matches.</p>
+    <button id="startBtn" type="button">Start playing</button>
+  </div>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="card">
+    <h2>Out of lives</h2>
+    <p class="big" id="finalScore">Score 0</p>
+    <p id="finalBest">Best 0</p>
+    <button id="playAgainBtn" type="button">Play again</button>
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
