@@ -101,12 +101,8 @@
       pad.dataset.value = options[i];
       restart(pad, 'pad-enter');
     });
-    if (hasSpeech) {
-      signText.textContent = 'Listen, then tap the letter';
-      speakLetter(currentLetter);
-    } else {
-      signText.textContent = 'Find the letter ' + currentLetter;
-    }
+    signText.textContent = hasSpeech ? 'Listen, then tap the letter' : 'Find the letter ' + currentLetter;
+    speakLetter(currentLetter);
   }
 
   function showFeedback(text, good) {
@@ -156,7 +152,8 @@
   initVoices();
 
   function speakLetter(letter) {
-    if (!soundOn || !hasSpeech) return;
+    if (!hasSpeech) { revealLetterFallback(letter); return; }
+    if (!soundOn) { revealLetterFallback(letter); return; }
     try {
       window.speechSynthesis.cancel();
       // Calling speak() immediately after cancel() gets silently dropped
@@ -171,11 +168,22 @@
         utter.volume = 1;
         if (chosenVoice) utter.voice = chosenVoice;
         activeUtterance = utter;
+        let started = false;
+        utter.onstart = () => { started = true; };
+        utter.onerror = () => { revealLetterFallback(letter); };
         if (window.speechSynthesis.paused) window.speechSynthesis.resume();
         window.speechSynthesis.speak(utter);
         restart(replayBtn, 'playing');
+        // If the engine never actually starts speaking (missing voice
+        // data, blocked engine, etc.), fall back to showing the letter
+        // so the game stays playable even without audio.
+        setTimeout(() => { if (!started) revealLetterFallback(letter); }, 900);
       }, 60);
-    } catch (e) { /* ignore */ }
+    } catch (e) { revealLetterFallback(letter); }
+  }
+
+  function revealLetterFallback(letter) {
+    signText.textContent = 'Find the letter ' + letter;
   }
 
   /* ---- Sound effects ---- */
