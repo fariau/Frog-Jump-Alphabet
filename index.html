@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Frog Jump ABC</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -11,51 +11,144 @@
 </head>
 <body>
 
+<!-- Shared artwork (drawn once, reused with <use>) -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <defs>
+    <radialGradient id="gPad" cx="35%" cy="30%" r="85%">
+      <stop offset="0" stop-color="#8FD463"/>
+      <stop offset=".6" stop-color="#4FAE45"/>
+      <stop offset="1" stop-color="#358F3C"/>
+    </radialGradient>
+  </defs>
+
+  <symbol id="lily" viewBox="0 0 100 100">
+    <path d="M50 50 L58 4.7 A46 46 0 1 1 42 4.7 Z" fill="url(#gPad)" stroke="#1F6B33" stroke-width="3" stroke-linejoin="round"/>
+    <g stroke="#2E8B3A" stroke-width="1.6" stroke-linecap="round" fill="none" opacity=".55">
+      <path d="M50 50 L84 30"/><path d="M50 50 L90 58"/><path d="M50 50 L70 88"/>
+      <path d="M50 50 L30 88"/><path d="M50 50 L10 58"/><path d="M50 50 L16 30"/>
+    </g>
+    <ellipse cx="33" cy="30" rx="16" ry="7" fill="#fff" opacity=".2" transform="rotate(-30 33 30)"/>
+  </symbol>
+
+  <symbol id="reed" viewBox="0 0 60 200">
+    <path d="M30 200 C14 150 10 110 8 70 C22 110 28 150 30 200Z" fill="#3E9A47"/>
+    <path d="M30 200 C46 160 52 120 54 84 C40 120 33 160 30 200Z" fill="#4CAF50"/>
+    <path d="M30 200 C30 150 26 110 30 44" stroke="#2E8B3A" stroke-width="4" fill="none" stroke-linecap="round"/>
+    <rect x="24" y="14" width="12" height="42" rx="6" fill="#8A5A2B" stroke="#5E3A1A" stroke-width="2"/>
+    <path d="M30 14 L30 3" stroke="#5E3A1A" stroke-width="2" stroke-linecap="round"/>
+  </symbol>
+
+  <symbol id="lotus" viewBox="0 0 80 60">
+    <g transform="translate(40 54)">
+      <ellipse rx="9" ry="26" cy="-24" fill="#FF9DC0" transform="rotate(-62)"/>
+      <ellipse rx="9" ry="26" cy="-24" fill="#FF9DC0" transform="rotate(62)"/>
+      <ellipse rx="9" ry="27" cy="-25" fill="#FFB3CF" transform="rotate(-32)"/>
+      <ellipse rx="9" ry="27" cy="-25" fill="#FFB3CF" transform="rotate(32)"/>
+      <ellipse rx="9" ry="28" cy="-26" fill="#FFD1E1"/>
+      <circle cy="-8" r="5" fill="#FFC93C"/>
+    </g>
+  </symbol>
+
+  <symbol id="frogart" viewBox="0 0 140 110">
+    <ellipse cx="26" cy="97" rx="21" ry="9" fill="#4E8F4A" stroke="#2F5F31" stroke-width="3"/>
+    <ellipse cx="114" cy="97" rx="21" ry="9" fill="#4E8F4A" stroke="#2F5F31" stroke-width="3"/>
+    <ellipse cx="70" cy="68" rx="49" ry="38" fill="#5FA05A" stroke="#2F5F31" stroke-width="3"/>
+    <ellipse cx="70" cy="79" rx="28" ry="21" fill="#CFE8B4"/>
+    <circle cx="46" cy="34" r="20" fill="#5FA05A" stroke="#2F5F31" stroke-width="3"/>
+    <circle cx="94" cy="34" r="20" fill="#5FA05A" stroke="#2F5F31" stroke-width="3"/>
+    <circle cx="46" cy="34" r="14" fill="#fff"/>
+    <circle cx="94" cy="34" r="14" fill="#fff"/>
+    <circle cx="48" cy="36" r="7" fill="#1B2B34"/>
+    <circle cx="92" cy="36" r="7" fill="#1B2B34"/>
+    <circle cx="50.5" cy="33" r="2.6" fill="#fff"/>
+    <circle cx="94.5" cy="33" r="2.6" fill="#fff"/>
+    <circle cx="30" cy="70" r="7" fill="#E9909F" opacity=".75"/>
+    <circle cx="110" cy="70" r="7" fill="#E9909F" opacity=".75"/>
+    <circle cx="64" cy="54" r="1.8" fill="#2F5F31"/>
+    <circle cx="76" cy="54" r="1.8" fill="#2F5F31"/>
+    <path d="M50 66 Q70 84 90 66" stroke="#24502A" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+    <ellipse cx="44" cy="103" rx="12" ry="6" fill="#4E8F4A" stroke="#2F5F31" stroke-width="2.5"/>
+    <ellipse cx="96" cy="103" rx="12" ry="6" fill="#4E8F4A" stroke="#2F5F31" stroke-width="2.5"/>
+  </symbol>
+
+  <symbol id="heartart" viewBox="0 0 32 29">
+    <path d="M16 28C6 20 1 15 1 8.5 1 4 4.5 1 8.5 1c3 0 5.5 1.6 7.5 4.6C18 2.6 20.5 1 23.5 1 27.5 1 31 4 31 8.5 31 15 26 20 16 28z"/>
+  </symbol>
+</svg>
+
 <div class="app">
 
+  <!-- Top bar: lives, title, score -->
   <header class="hud">
-    <div class="hearts" id="hearts" aria-label="Lives">
-      <span class="heart"></span><span class="heart"></span><span class="heart"></span>
+    <div class="hearts" id="hearts" role="img" aria-label="Lives">
+      <svg class="heart" viewBox="0 0 32 29"><use href="#heartart"/></svg>
+      <svg class="heart" viewBox="0 0 32 29"><use href="#heartart"/></svg>
+      <svg class="heart" viewBox="0 0 32 29"><use href="#heartart"/></svg>
     </div>
     <h1 class="title">Frog Jump ABC</h1>
-    <div class="score" id="scoreValue">0</div>
+    <div class="score" aria-label="Score">
+      <svg class="star" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5l2.9 6.1 6.6.8-4.9 4.6 1.3 6.6L12 17.3 6.1 20.6l1.3-6.6L2.5 9.4l6.6-.8z"/></svg>
+      <span id="scoreValue">0</span>
+    </div>
   </header>
 
-  <div class="sign" id="sign">
+  <!-- Listening sign -->
+  <section class="sign" id="sign">
     <div class="sun"></div>
     <div class="cloud cloud-1"></div>
     <div class="cloud cloud-2"></div>
     <span class="round-label" id="roundLabel">Round 1</span>
-    <p class="sign-text" id="signText">Listen, then tap the letter</p>
-    <button class="replay-btn" id="replayBtn" type="button">Hear it again</button>
-  </div>
+    <div class="sign-body">
+      <button class="replay-btn" id="replayBtn" type="button" aria-label="Hear the letter again">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+        <span>Hear it again</span>
+      </button>
+      <p class="sign-text" id="signText" aria-live="polite">Listen, then tap the letter</p>
+    </div>
+  </section>
 
+  <!-- Pond / play area -->
   <main class="pond" id="pond">
     <div class="water"></div>
     <div class="bubbles" id="bubbles"></div>
 
+    <svg class="reed reed--l1" aria-hidden="true"><use href="#reed"/></svg>
+    <svg class="reed reed--l2" aria-hidden="true"><use href="#reed"/></svg>
+    <svg class="reed reed--r1" aria-hidden="true"><use href="#reed"/></svg>
+    <svg class="reed reed--r2" aria-hidden="true"><use href="#reed"/></svg>
+    <svg class="lotus lotus--a" aria-hidden="true"><use href="#lotus"/></svg>
+    <svg class="lotus lotus--b" aria-hidden="true"><use href="#lotus"/></svg>
+
     <div class="pads-row" id="padsRow">
-      <button class="pad" type="button"><span class="leaf"></span><span class="value">A</span></button>
-      <button class="pad" type="button"><span class="leaf"></span><span class="value">B</span></button>
-      <button class="pad" type="button"><span class="leaf"></span><span class="value">C</span></button>
+      <button class="pad" type="button"><svg class="pad-art" aria-hidden="true"><use href="#lily"/></svg><span class="value">A</span></button>
+      <button class="pad" type="button"><svg class="pad-art" aria-hidden="true"><use href="#lily"/></svg><span class="value">B</span></button>
+      <button class="pad" type="button"><svg class="pad-art" aria-hidden="true"><use href="#lily"/></svg><span class="value">C</span></button>
     </div>
 
-    <div class="home-pad"></div>
+    <div class="home-pad"><svg class="pad-art" aria-hidden="true"><use href="#lily"/></svg></div>
 
     <div class="frog-wrap" id="frogWrap">
-      <div class="frog" id="frog">
-        <div class="frog-leg left"></div>
-        <div class="frog-leg right"></div>
-        <div class="frog-body">
-          <div class="frog-eye left"><span class="pupil"></span></div>
-          <div class="frog-eye right"><span class="pupil"></span></div>
-          <div class="frog-cheek left"></div>
-          <div class="frog-cheek right"></div>
-          <div class="frog-mouth"></div>
-          <div class="frog-belly"></div>
-        </div>
-      </div>
-      <div class="frog-shadow"></div>
+      <svg class="frog" id="frog" viewBox="0 0 140 110" aria-hidden="true">
+        <ellipse cx="26" cy="97" rx="21" ry="9" fill="#4E8F4A" stroke="#2F5F31" stroke-width="3"/>
+        <ellipse cx="114" cy="97" rx="21" ry="9" fill="#4E8F4A" stroke="#2F5F31" stroke-width="3"/>
+        <ellipse cx="70" cy="68" rx="49" ry="38" fill="#5FA05A" stroke="#2F5F31" stroke-width="3"/>
+        <ellipse cx="70" cy="79" rx="28" ry="21" fill="#CFE8B4"/>
+        <circle cx="46" cy="34" r="20" fill="#5FA05A" stroke="#2F5F31" stroke-width="3"/>
+        <circle cx="94" cy="34" r="20" fill="#5FA05A" stroke="#2F5F31" stroke-width="3"/>
+        <circle cx="46" cy="34" r="14" fill="#fff"/>
+        <circle cx="94" cy="34" r="14" fill="#fff"/>
+        <circle class="pupil" cx="48" cy="36" r="7" fill="#1B2B34"/>
+        <circle class="pupil" cx="92" cy="36" r="7" fill="#1B2B34"/>
+        <circle cx="50.5" cy="33" r="2.6" fill="#fff"/>
+        <circle cx="94.5" cy="33" r="2.6" fill="#fff"/>
+        <circle cx="30" cy="70" r="7" fill="#E9909F" opacity=".75"/>
+        <circle cx="110" cy="70" r="7" fill="#E9909F" opacity=".75"/>
+        <circle cx="64" cy="54" r="1.8" fill="#2F5F31"/>
+        <circle cx="76" cy="54" r="1.8" fill="#2F5F31"/>
+        <path d="M50 66 Q70 84 90 66" stroke="#24502A" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+        <ellipse cx="44" cy="103" rx="12" ry="6" fill="#4E8F4A" stroke="#2F5F31" stroke-width="2.5"/>
+        <ellipse cx="96" cy="103" rx="12" ry="6" fill="#4E8F4A" stroke="#2F5F31" stroke-width="2.5"/>
+      </svg>
     </div>
 
     <div class="confetti-layer" id="confettiLayer"></div>
@@ -63,28 +156,40 @@
     <div class="flash" id="flash"></div>
   </main>
 
+  <!-- Bottom bar -->
   <footer class="bottombar">
     <div class="chip" id="streakChip">🔥 <span id="streakValue">Streak 0</span></div>
     <div class="chip">🏆 <span id="bestValue">Best 0</span></div>
     <div class="bottom-actions">
-      <button class="icon-btn" id="soundBtn" type="button" aria-label="Toggle sound">🔊</button>
-      <button class="icon-btn" id="fullscreenBtn" type="button" aria-label="Toggle fullscreen">⛶</button>
+      <button class="icon-btn" id="soundBtn" type="button" aria-label="Toggle sound">
+        <svg class="on-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor"/><path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+        <svg class="off-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor"/><path d="M16.5 9.5l5 5M21.5 9.5l-5 5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+      </button>
+      <button class="icon-btn" id="fullscreenBtn" type="button" aria-label="Toggle fullscreen">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
     </div>
   </footer>
 
 </div>
 
+<!-- Start screen (needed so the browser allows sound and speech) -->
 <div class="overlay show" id="startOverlay">
   <div class="card">
-    <span class="frog-mini">🐸</span>
+    <svg class="card-frog" viewBox="0 0 140 110" aria-hidden="true"><use href="#frogart"/></svg>
     <h2>Frog Jump ABC</h2>
     <p>Listen to the letter, then tap the lily pad that matches.</p>
-    <button id="startBtn" type="button">Start playing</button>
+    <button id="startBtn" type="button">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15l13-7.5z" fill="currentColor"/></svg>
+      Start playing
+    </button>
   </div>
 </div>
 
+<!-- Game over -->
 <div class="overlay" id="overlay">
   <div class="card">
+    <div class="card-emoji" aria-hidden="true">💦</div>
     <h2>Out of lives</h2>
     <p class="big" id="finalScore">Score 0</p>
     <p id="finalBest">Best 0</p>
