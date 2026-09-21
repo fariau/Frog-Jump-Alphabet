@@ -168,22 +168,22 @@
         utter.volume = 1;
         if (chosenVoice) utter.voice = chosenVoice;
         activeUtterance = utter;
-        let started = false;
-        utter.onstart = () => { started = true; };
         utter.onerror = () => { revealLetterFallback(letter); };
         if (window.speechSynthesis.paused) window.speechSynthesis.resume();
         window.speechSynthesis.speak(utter);
         restart(replayBtn, 'playing');
-        // Only fall back to showing the letter as text if the engine
-        // genuinely never starts speaking (missing voice data, blocked
-        // engine, etc.) — some phones just take a moment to start.
-        setTimeout(() => { if (!started) revealLetterFallback(letter); }, 1800);
+        // Some phones fire the "start" event and report success even
+        // when no audible sound plays (muted ringer switch, missing
+        // voice data, restricted browser audio). Since that can't be
+        // detected from JS, always reveal the letter as text shortly
+        // after, so the game stays playable whether or not audio works.
+        setTimeout(() => revealLetterFallback(letter), 1100);
       }, 60);
     } catch (e) { revealLetterFallback(letter); }
   }
 
   function revealLetterFallback(letter) {
-    signText.textContent = 'Find the letter ' + letter;
+  signText.textContent = 'Listen, then tap the letter';
   }
 
   /* ---- Sound effects ---- */
